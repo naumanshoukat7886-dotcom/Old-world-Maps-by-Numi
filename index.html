@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Numi Maps Pro</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- Search -->
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
+
+  <!-- Compare -->
+  <script src="https://unpkg.com/leaflet-side-by-side/leaflet-side-by-side.js"></script>
+
+  <style>
+    body { margin:0; font-family: Arial; }
+    #map { height: 100vh; }
+
+    .panel {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: white;
+      padding: 12px;
+      border-radius: 10px;
+      z-index: 1000;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      width: 220px;
+    }
+
+    input, select {
+      width: 100%;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<div class="panel">
+  <b>Numi Maps Pro</b><br>
+
+  <label>Map Style</label>
+  <select id="style">
+    <option value="modern">Modern</option>
+    <option value="topo">Topographic</option>
+  </select>
+
+  <label>Year (Demo Timeline)</label>
+  <input type="range" min="1900" max="2024" value="2024" id="year">
+  <span id="yearValue">2024</span>
+
+  <label>Zoom</label>
+  <input type="range" min="3" max="18" value="6" id="zoom">
+</div>
+
+<script>
+  var map = L.map('map').setView([25.29, 51.53], 6);
+
+  var modern = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+  var topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png');
+
+  modern.addTo(map);
+
+  var current = modern;
+
+  // Search
+  L.Control.geocoder().addTo(map);
+
+  // Compare mode
+  var side = L.control.sideBySide(modern, topo).addTo(map);
+
+  // Style switch
+  document.getElementById("style").onchange = function(e){
+    map.removeLayer(current);
+    current = (e.target.value === "modern") ? modern : topo;
+    map.addLayer(current);
+  };
+
+  // Zoom
+  document.getElementById("zoom").oninput = function(e){
+    map.setZoom(e.target.value);
+  };
+
+  // Timeline (visual only demo)
+  var yearDisplay = document.getElementById("yearValue");
+  document.getElementById("year").oninput = function(e){
+    yearDisplay.innerText = e.target.value;
+
+    // future: load real historical tiles
+  };
+</script>
+
+</body>
+</html>
